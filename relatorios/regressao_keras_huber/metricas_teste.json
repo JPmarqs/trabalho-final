@@ -1,0 +1,140 @@
+{
+  "implementacao": "Keras 3.16.0.dev2026101404 / TensorFlow 2.22.0-rc0",
+  "problema": {
+    "tipo": "regressão",
+    "alvo": "log1p(VL_FOB)",
+    "entradas": [
+      "SH4 (one-hot)",
+      "CO_PAIS (one-hot)",
+      "SG_UF_MUN (one-hot)",
+      "CO_MES (seno/cosseno)",
+      "CO_ANO (padronizado)",
+      "log1p(KG_LIQUIDO) (padronizado)",
+      "indicador de peso ausente/zero"
+    ],
+    "unidade_observacao": "agregado município × SH4 × país × mês"
+  },
+  "protocolo": {
+    "treino": "2015-2023",
+    "validacao": "2024",
+    "teste": "2025",
+    "max_por_ano": 50000,
+    "semente": 42,
+    "amostras": {
+      "treino": 450000,
+      "validacao": 50000,
+      "teste": 50000
+    },
+    "criterio_parada": "parada antecipada (paciencia=5, métrica=MAE validação em log1p)",
+    "perda": "Huber escrito à mão (delta buscado no Optuna; unidade do delta = desvio-padrão do alvo padronizado)"
+  },
+  "busca": {
+    "ferramenta": "Optuna TPE + MedianPruner",
+    "tentativas": 12,
+    "loss": "huber",
+    "metrica": "MAE de validação (escala log1p, minimizar)",
+    "melhor_trial": 6,
+    "melhor_valor_validacao": 0.748009204864502
+  },
+  "melhor_modelo": "top6",
+  "baselines": {
+    "media_treino": {
+      "descricao": "prediz sempre a média de log1p(VL_FOB) observada no treino",
+      "mae_log": 2.7106128445958286,
+      "rmse_log": 3.253257476546159,
+      "r2_log": -0.006061609370250576,
+      "erro_pct_mediano": 99.69566134797894,
+      "erro_pct_p90": 8052.692286536737
+    },
+    "linear_somente_peso": {
+      "descricao": "reta fechada log1p(VL_FOB) ~ log1p(KG_LIQUIDO) ajustada no treino",
+      "coeficientes": [
+        4.206909552381084,
+        0.682480373540903
+      ],
+      "mae_log": 1.3007606876303754,
+      "rmse_log": 1.66846108259423,
+      "r2_log": 0.7353817055519654,
+      "erro_pct_mediano": 81.6315022512694,
+      "erro_pct_p90": 756.3548253384761
+    }
+  },
+  "modelos_teste": {
+    "top6": {
+      "mae_log": 0.793007682642748,
+      "rmse_log": 1.1448559947834682,
+      "r2_log": 0.8754082089572476,
+      "erro_pct_mediano": 54.65372957301001,
+      "erro_pct_p90": 324.1136934035225,
+      "arquitetura": "1469 -> 256 -> 256 -> 256 -> 1",
+      "parametros": 508161,
+      "dropout": 0.14338629141770906,
+      "l2": 2.2264204303769692e-06,
+      "lr": 0.0001018959297939515,
+      "batch_size": 256,
+      "huber_delta": 0.1241318963529422,
+      "epocas_executadas": 19,
+      "melhor_epoca": 14,
+      "mae_validacao_log": 0.7454932928085327,
+      "segundos_treino": 373.6,
+      "ms_inferencia_por_mil": 0.011
+    },
+    "top11": {
+      "mae_log": 0.798414357895126,
+      "rmse_log": 1.1462664741752921,
+      "r2_log": 0.8751010220132373,
+      "erro_pct_mediano": 54.663864499412554,
+      "erro_pct_p90": 340.67778044834824,
+      "arquitetura": "1469 -> 256 -> 256 -> 256 -> 1",
+      "parametros": 508161,
+      "dropout": 0.12344914916091884,
+      "l2": 2.9273254434735685e-06,
+      "lr": 0.00011425536640289148,
+      "batch_size": 256,
+      "huber_delta": 0.4292297307815338,
+      "epocas_executadas": 16,
+      "melhor_epoca": 11,
+      "mae_validacao_log": 0.7543463110923767,
+      "segundos_treino": 288.4,
+      "ms_inferencia_por_mil": 0.012
+    },
+    "top2": {
+      "mae_log": 0.7972549230206197,
+      "rmse_log": 1.1398042449533476,
+      "r2_log": 0.8765053214567692,
+      "erro_pct_mediano": 54.78899086918547,
+      "erro_pct_p90": 334.45985152858213,
+      "arquitetura": "1469 -> 256 -> 256 -> 256 -> 1",
+      "parametros": 508161,
+      "dropout": 0.24301794076057537,
+      "l2": 3.247673570627449e-06,
+      "lr": 0.000471705203762518,
+      "batch_size": 1024,
+      "huber_delta": 1.5635108708133456,
+      "epocas_executadas": 12,
+      "melhor_epoca": 7,
+      "mae_validacao_log": 0.7608907222747803,
+      "segundos_treino": 116.1,
+      "ms_inferencia_por_mil": 0.006
+    },
+    "baseline_sem_reg": {
+      "mae_log": 0.8257983694560879,
+      "rmse_log": 1.1738979770515994,
+      "r2_log": 0.8690069023310983,
+      "erro_pct_mediano": 59.996414109904094,
+      "erro_pct_p90": 335.4521007489511,
+      "arquitetura": "1469 -> 256 -> 256 -> 256 -> 1",
+      "parametros": 508161,
+      "dropout": 0.0,
+      "l2": 0.0,
+      "lr": 0.0001018959297939515,
+      "batch_size": 256,
+      "huber_delta": 0.1241318963529422,
+      "epocas_executadas": 11,
+      "melhor_epoca": 6,
+      "mae_validacao_log": 0.7800527215003967,
+      "segundos_treino": 162.4,
+      "ms_inferencia_por_mil": 0.009
+    }
+  }
+}
